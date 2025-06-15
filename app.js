@@ -4,6 +4,7 @@ const cors = require("cors");
 require('dotenv').config()
 
 const dishesRoutes = require('./routes/dishes')
+const usersRoutes = require('./routes/users')
 
 app.use(cors());
 app.use(express.json()) // for parsing application/json
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/dishes', dishesRoutes)
+app.use('/users', usersRoutes)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
