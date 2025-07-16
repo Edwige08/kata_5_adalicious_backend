@@ -8,8 +8,35 @@ const prisma = new PrismaClient()
 // use `prisma` in your application to read and write data in your DB
 
 router.get('/', async (req, res) => {
-    const orders = await prisma.orders.findMany()
-    res.json(orders)
+    try {
+        const orders = await prisma.orders.findMany({
+            select: {
+                id: true,
+                order_status: true,
+                created_at: true,
+                users: {
+                    select: {
+                        username: true
+                    }
+                },
+                dishes: {
+                    select: {
+                        dish_name: true,
+                        image: true
+                    }
+                }
+            },
+            orderBy: {
+                created_at: 'desc'
+            }
+        })
+        console.log(orders);
+        
+        res.status(200).json(orders)
+    }
+    catch {
+        res.status(500).json({error : 'Erreur lors de la récupération des commandes'})
+    }
 })
 
 router.post('/', async (req, res) => {
@@ -28,9 +55,23 @@ router.post('/', async (req, res) => {
     // res.sendStatus(200)
 })
 
+router.patch('/', async (req, res) => {
+    const {orderId, order_status} = req.body
+    
+    const updateOrder = await prisma.orders.update({
+        where: {
+            id: orderId
+        },
+        data: {
+            order_status: order_status
+        }
+    })
+    res.json(updateOrder)
+    // res.sendStatus(200)
+})
+
 router.delete('/', async (req, res) => {
     const {orderId} = req.body;
-    console.log("🍓 ", req.body.id)
     const deleteDish = await prisma.orders.delete({
         where: {
             id: orderId
